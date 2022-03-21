@@ -1,0 +1,20 @@
+命名通則物力統一寫法，方便後續維護
+並要有意義的命名，不要用單字母、代號來命名
+a = [1,2,3] #不行!    student_num = [1,2,3] #可以!
+
+註解的部分，能在每個function或功能中註解說明做什麼用的
+不用怕註解->但也不用所有都註解，太瑣碎
+
+Python命名通則
+
+1.  package: lower_with_under (public)
+2.  modules: lower_with_under (public), _lower_with_under (internal)
+3.  classes: CapWords (public) _CapWords (internal)
+4.  exceptions: CapWords (public)
+5.  functions: lower_with_under() (public), _lower_with_under() (internal)
+6.  global/class constants: CAPS_WITH_UNDER (public), _CAPS_WITH_UNDER (private)
+7.  global/class variables: lower_with_under (public), _lower_with_under (private)
+8.  instance variables: lower_with_under (public), _lower_with_under (protected), __lower_with_under (private)
+9.  method names: lower_with_under() (public), _lower_with_under() (protected), __lower_with_under() (private)
+10. function/method parameters: lower_with_under
+11. local variables: lower_with_under (public)
