@@ -19,6 +19,11 @@ with open('read_this_file.txt','r',encoding="utf-8") as f:
 # 用with能簡潔的讀取檔案，且不須再關閉文件(f.close())
 print(read_file2)
 
+# # with 另一種寫法
+# with open("read_this_file.txt",'r',encoding='utf-8') as f:
+#     for line in f:
+#         print(line, end="")
+
 with open('read_this_file.txt','r',encoding="utf-8") as f:
     read_file3_single_line = f.readline()
 # 僅讀取"單行"資料
