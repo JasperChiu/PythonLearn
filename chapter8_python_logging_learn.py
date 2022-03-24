@@ -12,18 +12,18 @@ formatter = logging.Formatter("%(asctime)s-%(name)s-%(levelname)s-%(message)s",
 # 1. 要輸出到console的設定
 # handler 負責處理 log 訊息的輸出工作，StreamHandler() 在不加任何參數的情況下
 # 會把訊息輸出到 stderr，在作業系統未做額外的配置下，stderr 可以簡單的理解為顯示到螢幕上。
-sh = logging.StreamHandler()
+ch = logging.StreamHandler()
 # 指定在console中 設定要顯示的層級
-sh.setLevel(logging.DEBUG)
+ch.setLevel(logging.DEBUG)
 # 設定格式(套用先前設定好的格式)
-sh.setFormatter(formatter)
+ch.setFormatter(formatter)
 # 添加handler，而一個 logger 可以加上數個 handler，除了加入一個 StreamHandler 外，還可以再定義其他的 handler
 # 例如一個 FileHandler，如此一則 log 訊息就會被顯示在螢幕上以及被存到某個 log 檔內。
-dev_logger.addHandler(sh)
+dev_logger.addHandler(ch)
 
 # 2. 要輸出到log日誌檔的設定
 # 設定 log 檔名
-log_filename = datetime.datetime.now().strftime("%Y-%m-%d_test_log.log")
+log_filename = datetime.datetime.now().strftime("%Y%m%d_test_log.log")
 # 將log日誌記錄輸出到文件中，是從 StreamHandler 繼承了輸出功能。
 # 預設的 mode 是 a:續寫 w:覆寫
 fh = logging.FileHandler(log_filename, mode="a")
