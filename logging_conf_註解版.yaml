@@ -1,0 +1,55 @@
+version: 1 # 配置字典的版本
+# 是否關閉已存在的日誌，預設為False
+disable_existing_loggers: False
+
+# 先定義多個Formatter物件
+formatters:
+# Formatter物件standard,格式為上述變數內的值.
+  standard:
+    format: '%(asctime)s-%(name)s-%(filename)s-%(funcName)s-%(module)s-%(lineno)d-%(levelname)s-%(message)s'
+    datefmt: '%Y%m%d'
+
+# Formatter物件simple,格式為上述變數內的值.
+  simple:
+    format: '%(asctime)s-%(name)s-%(message)s'
+    datefmt: '%Y%m%d'
+
+# 裡面是定義的多個Handler物件。
+handlers:
+# 列印到終端的Handler物件console
+  console:
+    # 列印到螢幕
+    class: logging.StreamHandler
+    # 級別為DEBUG
+    level: DEBUG
+    # 繫結Formatter物件為standard
+    formatter: standard
+# 列印到檔案的Handler物件file
+  file:
+    # 儲存到檔案
+    class: logging.FileHandler
+    # 指定日誌檔案路徑(檔名)
+    filename: 'Jasper-test-log-yaml-ver.log'
+    # 寫入模式
+    mode: 'w'
+    level: DEBUG
+    formatter: standard
+    # 編碼
+    encoding: utf8
+
+loggers:
+# 裡面是定義的多個logger物件
+  simpleConsole:
+    level: DEBUG
+    handlers: [console]
+    propagate: False
+  fileAndConsole:
+    level: DEBUG
+    # 這裡把上面定義的兩個handler都加上，即log資料既寫入檔案又列印到螢幕
+    handlers: [file,console]
+    # 向上（更高level的logger）傳遞,通常設定為False即可，否則會一份日誌向上層層傳遞
+    propagate: False
+
+root:
+  level: DEBUG
+  handlers: [console]
