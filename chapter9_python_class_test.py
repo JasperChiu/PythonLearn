@@ -1,5 +1,7 @@
 class Accumulate:
-    def accumulate_orginal_for(self, n):
+    def __init__(self, n):
+        self.n = n
+    def accumulate_orginal_for(self,):
         # 在執行了這個函式，便會將資訊記錄到log中
         logger.info('use accumulate_orginal_for func')
         # 使用for迴圈計算1-2+3-4+5... 循序計算複雜度O(n)
@@ -10,7 +12,7 @@ class Accumulate:
             judge_posorneg *= -1
         return acc_sum
 
-    def accumulate_orginal_while(self, n):
+    def accumulate_orginal_while(self,):
         # 測試能否填入中文
         logger.info('執行 accumulate_orginal_while 的函式')
         # 使用while迴圈計算1-2+3-4+5... 循序計算複雜度O(n)
@@ -23,7 +25,7 @@ class Accumulate:
             i += 1
         return acc_sum
 
-    def accumulate_math(self, n):
+    def accumulate_math(self,):
         # 測試使用其他等級
         logger.warning('執行 accumulate_math 的函式')
         # 使用數學方式去處理，直接判斷n是奇數還是偶數，來計算最終的值，複雜度O(3)，當n很大時仍不影響計算
@@ -46,31 +48,33 @@ if __name__ == '__main__':
     logging.config.fileConfig('logging.conf')
     logger = logging.getLogger('fileAndConsole')
 
-    acc = Accumulate()
-    # 要測試的n值
+    # 要測試的n值，n值定義到init中，然後套用到所有method中
     n = 10 ** 7
+    acc = Accumulate(n)
 
     start = time.time()
-    print(acc.accumulate_orginal_for(n))
+    print(acc.accumulate_orginal_for()) # 印出計算結果
     end = time.time()
-    print(format(end - start))
-    logger.info('for loop done', exc_info=True)
+    # print(format(end - start)) # 印出計算耗時
+    # 改成將計算耗時紀錄到log檔案中
+    logger.info(f'for loop done wasted {"{:.4f}".format(end - start)} sec.')
 
     start = time.time()
-    print(acc.accumulate_orginal_while(n))
+    print(acc.accumulate_orginal_while())
     end = time.time()
-    print(format(end - start))
-    logger.info('while loop done', exc_info=True)
+    # print(format(end - start))
+    logger.info(f'while loop done wasted {"{:.4f}".format(end - start)} sec.')
 
     start = time.time()
-    print(acc.accumulate_math(n))
+    print(acc.accumulate_math())
     end = time.time()
-    print(format(end - start))
-    logger.info('math calculate done', exc_info=True)
+    # print(format(end - start))
+    logger.info(f'math calculate done wasted {"{:.4f}".format(end - start)} sec.')
 
     try:
         TryUseLog()
     except:
         logger.critical('critical', exc_info=True)
+
 
 

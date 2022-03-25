@@ -1,17 +1,14 @@
-20220325-fileAndConsole-chapter9_python_class_test.py-accumulate_orginal_for-chapter9_python_class_test-4-INFO-use accumulate_orginal_for func
-20220325-fileAndConsole-chapter9_python_class_test.py-<module>-chapter9_python_class_test-57-INFO-for loop done
-NoneType: None
-20220325-fileAndConsole-chapter9_python_class_test.py-accumulate_orginal_while-chapter9_python_class_test-15-INFO-執行 accumulate_orginal_while 的函式
-20220325-fileAndConsole-chapter9_python_class_test.py-<module>-chapter9_python_class_test-63-INFO-while loop done
-NoneType: None
-20220325-fileAndConsole-chapter9_python_class_test.py-accumulate_math-chapter9_python_class_test-28-WARNING-執行 accumulate_math 的函式
-20220325-fileAndConsole-chapter9_python_class_test.py-<module>-chapter9_python_class_test-69-INFO-math calculate done
-NoneType: None
-20220325-fileAndConsole-chapter9_python_class_test.py-__init__-chapter9_python_class_test-38-INFO-嘗試在其他模組(module)上添加log日誌的紀錄，看記錄下來的資訊差異
-20220325-fileAndConsole-chapter9_python_class_test.py-<module>-chapter9_python_class_test-74-CRITICAL-critical
+20220325-fileAndConsole-chapter9_python_class_test.py-accumulate_orginal_for-chapter9_python_class_test-6-INFO-use accumulate_orginal_for func
+20220325-fileAndConsole-chapter9_python_class_test.py-<module>-chapter9_python_class_test-60-INFO-for loop done wasted 1.2052 sec.
+20220325-fileAndConsole-chapter9_python_class_test.py-accumulate_orginal_while-chapter9_python_class_test-17-INFO-執行 accumulate_orginal_while 的函式
+20220325-fileAndConsole-chapter9_python_class_test.py-<module>-chapter9_python_class_test-66-INFO-while loop done wasted 1.8912 sec.
+20220325-fileAndConsole-chapter9_python_class_test.py-accumulate_math-chapter9_python_class_test-30-WARNING-執行 accumulate_math 的函式
+20220325-fileAndConsole-chapter9_python_class_test.py-<module>-chapter9_python_class_test-72-INFO-math calculate done wasted 0.0000 sec.
+20220325-fileAndConsole-chapter9_python_class_test.py-__init__-chapter9_python_class_test-40-INFO-嘗試在其他模組(module)上添加log日誌的紀錄，看記錄下來的資訊差異
+20220325-fileAndConsole-chapter9_python_class_test.py-<module>-chapter9_python_class_test-77-CRITICAL-critical
 Traceback (most recent call last):
-  File "E:\JasperWork\PythonLearn\chapter9_python_class_test.py", line 72, in <module>
+  File "E:\JasperWork\PythonLearn\chapter9_python_class_test.py", line 75, in <module>
     TryUseLog()
-  File "E:\JasperWork\PythonLearn\chapter9_python_class_test.py", line 39, in __init__
+  File "E:\JasperWork\PythonLearn\chapter9_python_class_test.py", line 41, in __init__
     5/0
 ZeroDivisionError: division by zero
