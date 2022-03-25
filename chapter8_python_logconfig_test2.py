@@ -2,23 +2,22 @@
 
 import logging
 import logging.config
-# logging.config.fileConfig
-# 從一個 configparser 格式文件中讀取日誌記錄配置。文件格式應當與 配置文件格式中的描述一致。
-# 此函數可在應用程序中被多次調用，以允許最終用戶在多個預設配置中進行選擇
-logging.config.fileConfig('logging.conf')
+import yaml # 需要安裝 pyyaml 庫
 
-# create logger
-logger = logging.getLogger('fileAndConsole')
+with open('logging_conf.yaml', 'r') as f:
+    config = yaml.safe_load(f.read())
+    # 從一個字典獲取日誌記錄配置
+    logging.config.dictConfig(config)
 
-# 'application' code
-# logger.debug('debug message')
-# logger.info('info message')
-# logger.warning('warn message')
-# logger.error('error message')
-# logger.critical('critical message')
+# logger的fileAndConsole是寫入檔案+輸出到console的設定
+logger = logging.getLogger("fileAndConsole")
+# logger2的simpleExample是輸出到console的設定。
+logger2 = logging.getLogger("simpleConsole")
+
+
 
 try:
-    logger.debug('debug message', exc_info=True)
+    logger  .debug('debug message', exc_info=True)
     logger.info('info message', exc_info=True)
     logger.warning('warn message', exc_info=True)
     x = 5 / 0
@@ -40,7 +39,8 @@ def login(username=None, password=None):
     logger.info("登錄失敗，用戶名或密碼錯誤")
     return {"code": 300, "msg": "用戶名或密碼錯誤"}
 
+
 print(login("Jasper"))
-print(login("Jasper","123444"))
-print(login("Jasper","123456"))
+print(login("Jasper", "123444"))
+print(login("Jasper", "123456"))
 
