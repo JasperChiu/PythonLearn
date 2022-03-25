@@ -36,7 +36,18 @@ handlers:
     formatter: standard
     # 編碼
     encoding: utf8
-
+# 能限制log檔案大小以及最大存儲檔案大小，並能設定備份幾個檔案
+  rotating_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: standard
+    # 指定路徑
+    filename: 'Jasper-test-log-yaml-ver-rotating.log'
+    # 限制日誌大小，超過則新增.log1檔案
+    maxBytes: 5000
+    # 最大儲存3個日誌檔案
+    backupCount: 3
+    encoding: utf8
 loggers:
 # 裡面是定義的多個logger物件
   simpleConsole:

@@ -20,6 +20,14 @@ handlers:
     level: DEBUG
     formatter: standard
     encoding: utf8
+  rotating_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: standard
+    filename: 'Jasper-test-log-yaml-ver-rotating.log'
+    maxBytes: 5000
+    backupCount: 3
+    encoding: utf8
 
 loggers:
   simpleConsole:
@@ -29,6 +37,10 @@ loggers:
   fileAndConsole:
     level: DEBUG
     handlers: [file,console]
+    propagate: False
+  fileAndConsoleRotating:
+    level: DEBUG
+    handlers: [rotating_file_handler,console]
     propagate: False
 
 root:

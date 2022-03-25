@@ -10,9 +10,12 @@ with open('logging_conf.yaml', 'r') as f:
     logging.config.dictConfig(config)
 
 # logger的fileAndConsole是寫入檔案+輸出到console的設定
-logger = logging.getLogger("fileAndConsole")
+# logger = logging.getLogger("fileAndConsole")
+# logger的fileAndConsoleRotating是是寫入檔案+輸出到console的設定
+# 並能限制log檔案大小以及最大存儲檔案大小，並能設定備份幾個檔案
+logger = logging.getLogger("fileAndConsoleRotating")
 # logger2的simpleExample是輸出到console的設定。
-logger2 = logging.getLogger("simpleConsole")
+# logger2 = logging.getLogger("simpleConsole")
 
 
 
