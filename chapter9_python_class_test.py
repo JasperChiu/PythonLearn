@@ -24,6 +24,7 @@ class Accumulate:
         return acc_sum
 
     def accumulate_math(self, n):
+        # 測試使用其他等級
         logger.warning('執行 accumulate_math 的函式')
         # 使用數學方式去處理，直接判斷n是奇數還是偶數，來計算最終的值，複雜度O(3)，當n很大時仍不影響計算
         determining_odd = n % 2
@@ -31,6 +32,11 @@ class Accumulate:
             return int(n + 1) / 2
         elif determining_odd == 0:
             return int(n / 2) * (-1)
+
+class TryUseLog:
+    def __init__(self):
+        logger.info('嘗試在其他模組(module)上添加log日誌的紀錄，看記錄下來的資訊差異')
+        5/0
 
 if __name__ == '__main__':
     import time
@@ -61,3 +67,10 @@ if __name__ == '__main__':
     end = time.time()
     print(format(end - start))
     logger.info('math calculate done', exc_info=True)
+
+    try:
+        TryUseLog()
+    except:
+        logger.critical('critical', exc_info=True)
+
+
