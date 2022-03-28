@@ -63,15 +63,18 @@ class OldBookRemake:
         return img
 
     def detect_img(self, origin_img, resize_ratio, filter_size, dilate_iter):
+        # 檢測圖片，思路:先將圖片做多次腐蝕，多次腐蝕會讓較小面積的文字被腐蝕掉，理論上圖片的區域會有較大的面積相連，因此不會被完全清除
+        # 接下來在執行膨脹操作，目的是為了把保留下來的圖片區域膨脹回去原來大小(也可以多擴張一點，抓寬鬆)
         img = cv2.resize(origin_img, None, fx=resize_ratio, fy=resize_ratio)  # resize_ratio 縮放比率
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img_gray = cv2.medianBlur(img_gray, filter_size)  # filter_sieze 灰階模糊化濾波器大小
         ret, thresh = cv2.threshold(img_gray, 127, 255, cv2.THRESH_BINARY_INV)
-        kernel = np.ones((3, 3), np.uint8)
+        kernel = np.ones((3, 3), np.uint8) # 濾波核，可以調整大小，也可以指定參數
         thresh = cv2.dilate(thresh, kernel, iterations=2) # 先膨脹一次，讓有些掃圖的黑白間隙給補上
         thresh = cv2.erode(thresh, kernel, iterations=dilate_iter)  # 先腐蝕掉大部分的點
         thresh = cv2.dilate(thresh, kernel, iterations=dilate_iter+1)  # 在膨脹回原圖大小
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        # self.show_img(img) # 展示原圖
         return img, contours
 
     def img_preprocessing(self, origin_img, resize_ratio, filter_size, dilate_iter):
@@ -140,20 +143,26 @@ class OldBookRemake:
             img, contours = self.detect_img(origin_img, resize_ratio, filter_size, dilate_iter)
             img = cv2.drawContours(img, contours, -1, (0, 0, 255), 5)
             self.show_img(img)
-            # contours_list = self.img_noise_processing(img,contours,min_area_size,indent)
-            # mask = np.zeros(img.shape, np.uint8)
-            # for i in contours_list:
-            #     mask = cv2.drawContours(mask, contours, i, (255, 255, 255), -1)
+            contours_list = self.img_noise_processing(img,contours,min_area_size,indent)
+            mask = np.zeros(img.shape, np.uint8)
+            for i in contours_list:
+                mask = cv2.drawContours(mask, contours, i, (255, 255, 255), -1)
             #
             # dst = cv2.drawContours(img, contours, -1, (255, 0, 0), 3)
             # self.show_img(dst)
-            # self.show_img(mask)
-            # mask_reverse = (np.ones(img.shape, dtype=np.uint8) * 255) - mask
-            # self.show_img(mask_reverse)
-            # mask_reverse = cv2.resize(mask_reverse, (origin_img.shape[1], origin_img.shape[0]))
-            # img_add = cv2.add(origin_img, mask_reverse)
-            # self.show_img(img_add)
-            #
+            self.show_img(mask)
+            mask_reverse = (np.ones(img.shape, dtype=np.uint8) * 255) - mask
+            self.show_img(mask_reverse)
+            mask_reverse = cv2.resize(mask_reverse, (origin_img.shape[1], origin_img.shape[0]))
+            img_add = cv2.add(origin_img, mask_reverse)
+            self.show_img(img_add)
+
+            for cnt in contours: # 也許可以改用矩形包圍來處理 鏤空的案例
+                x, y, w, h = cv2.boundingRect(cnt)
+                # 藍色線段為正矩形
+                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), -1)
+            self.show_img(img)
+
             # img_line = self.draw_approx_hull_polygon(img, contours)
             # img_rect = self.draw_min_rect_circle(img, contours)
             # self.show_img(img_line)
@@ -178,22 +187,20 @@ if __name__ == '__main__':
     img_number_list1 = [0, 2, 3, 4, 5]  # 較大字體
     img_number_list2 = [4, 7, 8, 9, 10]  # 較單純的圖片
     img_number_list3 = [11, 12, 14, 22, 30, 280, 800, 802]  # 文字+雜訊
-    img_number_list4 = [29, 81, 117, 421, 423, 426, 430, 432, 467, 493, 562, 613, 614, 624]  # 文字+圖片部分
-    img_number_list5 = [616, 650, 666, 724, 725]  # 較淡的圖片+文字
-    img_number_list6 = [215, 216, 278, 788]  # 雜訊汙染到文字
+    img_number_list4 = [215, 216, 278, 788]  # 雜訊汙染到文字(較難)
+    img_number_list5 = [29, 81, 117, 421, 423, 426, 430, 432, 467, 493, 562, 613, 614, 624]  # 文字+圖片部分
+    img_number_list6 = [616, 650, 666, 724, 725]  # 較淡的圖片+文字
 
-    for i in img_number_list1:
-        OBR.main(i, 0.4, 3, 20, 500, 100)
+    # for i in img_number_list2: # 測試清單 # 檢測圖片迭代次數至少要20以上
+    #     OBR.main(i, resize_ratio, filter_size, 20, 200, indent)
 
     # 圖片部分參數
-    # OBR.main(2, 0.4, 3, 5, 500, 100)
+    # OBR.main(4, 0.4, 3, 20, 500, 100) # 簡單圖片
+    OBR.main(432, 0.4, 3, 20, 500, 100) # 較難圖片，簍空，可用矩形補
+    # OBR.main(81, 0.4, 3, 20, 500, 100)  # 較難圖片，簍空，矩形也補不完，可能還要用IOU跟Mask做對比(或統一都用IOU去算..?)
 
     # (81)文字部分參數，如逗點或像素數少的字(ex 一)，min_area_size建議取的保守(200)
     # OBR.main(21, 0.4, 3, 5, 200, 100)
-
-
-    # for i in img_number_list2: # 測試清單
-    #     OBR.main(i, resize_ratio, filter_size, dilate_iter, min_area_size, indent)
 
     # 隨機測試
     # import random

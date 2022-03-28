@@ -28,7 +28,6 @@ class OldBookRemake:
                                                  int(cv2.IMWRITE_TIFF_YDPI), 600,  # 設定垂直dpi
                                                  ])
 
-
     def draw_approx_hull_polygon(self, img, cnts):
         # 參考自https://zhuanlan.zhihu.com/p/38739563
         img = np.copy(img)
@@ -64,18 +63,22 @@ class OldBookRemake:
         return img
 
     def detect_img(self, origin_img, resize_ratio, filter_size, dilate_iter):
+        # 檢測圖片；思路:先將圖片做多次腐蝕，多次腐蝕會讓較小面積的文字被腐蝕掉，理論上圖片的區域會有較大的面積相連，因此不會被完全清除
+        # 接下來在執行膨脹操作，目的是為了把保留下來的圖片區域膨脹回去原來大小(也可以多擴張一點，抓寬鬆)
         img = cv2.resize(origin_img, None, fx=resize_ratio, fy=resize_ratio)  # resize_ratio 縮放比率
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img_gray = cv2.medianBlur(img_gray, filter_size)  # filter_sieze 灰階模糊化濾波器大小
         ret, thresh = cv2.threshold(img_gray, 127, 255, cv2.THRESH_BINARY_INV)
-        kernel = np.ones((3, 3), np.uint8)
+        kernel = np.ones((3, 3), np.uint8) # 濾波核，可以調整大小，也可以指定參數
         thresh = cv2.dilate(thresh, kernel, iterations=2) # 先膨脹一次，讓有些掃圖的黑白間隙給補上
         thresh = cv2.erode(thresh, kernel, iterations=dilate_iter)  # 先腐蝕掉大部分的點
         thresh = cv2.dilate(thresh, kernel, iterations=dilate_iter+1)  # 在膨脹回原圖大小
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        return img, contours
+        return img, contours #@ img還是原圖...其實沒必要回傳，但先保留
 
     def img_preprocessing(self, origin_img, resize_ratio, filter_size, dilate_iter):
+        # 圖像前處理；將原圖縮放->二值化->基礎模糊化->膨脹迭代->提取邊緣區塊輸出contours
+        # contours包含的資料是框選到的區塊，一個區塊就是一個list
         img = cv2.resize(origin_img, None, fx=resize_ratio, fy=resize_ratio) # resize_ratio 縮放比率
         """
         # 測試功能:直接畫白線雖然可以切分開大區塊的雜訊，但可能會導致切分開的靠內的雜訊 質心落在範圍裏面
@@ -95,11 +98,14 @@ class OldBookRemake:
         return img, contours
 
     def img_noise_processing(self, img, contours, min_area_size, indent):
+        # 雜訊處理；將前面框選出來的區塊，透過設定條件，來篩選那些是不要的雜訊
+        # 兩種思路；其一透過計算面積，小於一定閾值的就清除掉。(謹慎取值，若是值設定的太激進逗點和句號可能都會消失，@也能嘗試透過數學取值，後25%的面積平均作為雜訊閾值?)
+        # 其二透過計算質心，若是該區塊的質心落在指定的邊界外，則是為雜訊清除掉(要看各種案例，不曉得有沒有通則，或是透過一定的計算公式來決定取值)
         n = len(contours)
         contours_list = []
         clear_list = []
         for i in range(n):
-            contours_list.append(i)
+            contours_list.append(i) # 此處只是順便建立contours的索引，因為contours是tuple不方便直接利用
             area = cv2.contourArea(contours[i])
             # print(f"輪廓{i}面積 = {area}")
             M = cv2.moments(contours[i])
@@ -136,7 +142,7 @@ class OldBookRemake:
                     cv2.circle(img, (cX, cY), 5, (0, 255, 0), -1)
                     clear_list.append(i)
             """
-
+        # contours_list和要清除的清單clear_list取差集，便可以獲得要保留的清單
         contours_list = set(contours_list).difference(set(clear_list))
         return contours_list
 
@@ -149,25 +155,27 @@ class OldBookRemake:
             origin_img = x
             img, contours = self.img_preprocessing(origin_img, resize_ratio, filter_size, dilate_iter)
             contours_list = self.img_noise_processing(img,contours,min_area_size,indent)
-            mask = np.zeros(img.shape, np.uint8)
+            mask = np.zeros(img.shape, np.uint8) # 先建立全黑的遮罩(也可以全白啦，思路相同)
             for i in contours_list:
+                # 將要保留的區塊使用純白的色塊填滿
                 mask = cv2.drawContours(mask, contours, i, (255, 255, 255), -1)
-
+            # dst為在img基礎上畫上contours框選到的所有區塊
+            # 紅色區塊和綠色區塊是img_noise_processing 所標註的要清除的區域(理論上也可以複製新的圖片單獨呈現，但就都先畫在img上==)
             dst = cv2.drawContours(img, contours, -1, (255, 0, 0), 3)
             self.show_img(dst)
-            self.show_img(mask)
-            mask_reverse = (np.ones(img.shape, dtype=np.uint8) * 255) - mask
-            self.show_img(mask_reverse)
-            mask_reverse = cv2.resize(mask_reverse, (origin_img.shape[1], origin_img.shape[0]))
-            img_add = cv2.add(origin_img, mask_reverse)
+            self.show_img(mask) # 呈現黑底白內容物的遮罩
+            mask_reverse = (np.ones(img.shape, dtype=np.uint8) * 255) - mask # 遮罩反轉(取反)
+            self.show_img(mask_reverse) # 呈現白底黑內容物的遮罩 # 注意黑的值其實是0 白是255
+            mask_reverse = cv2.resize(mask_reverse, (origin_img.shape[1], origin_img.shape[0])) # 遮罩resize回原圖尺寸大小
+            img_add = cv2.add(origin_img, mask_reverse) # 將原圖和遮罩疊加，此時只有遮罩內為0(黑色)的區塊才會有原圖出現
             self.show_img(img_add)
 
-            img_line = self.draw_approx_hull_polygon(img, contours)
-            img_rect = self.draw_min_rect_circle(img, contours)
+            img_line = self.draw_approx_hull_polygon(img, contours) # 船型包圍的框線
+            img_rect = self.draw_min_rect_circle(img, contours) # 矩形包圍的框線
             self.show_img(img_line)
             self.show_img(img_rect)
 
-            self.save_img(img_add,img_number)
+            self.save_img(img_add,img_number) # 儲存圖片 # 還有待更進一步處理
 
             """ # 嘗試用np強制將陣列內值用成0&1，再轉圖片，失敗
             x = img_add[:,:,0]/255
@@ -201,17 +209,17 @@ if __name__ == '__main__':
     img_number_list5 = [29, 81, 117, 421, 423, 426, 430, 432, 467, 493, 562, 613, 614, 624]  # 文字+圖片部分
     img_number_list6 = [616, 650, 666, 724, 725]  # 較淡的圖片+文字
 
-    for i in img_number_list2  : # 測試清單
-        OBR.main(i, resize_ratio, filter_size, dilate_iter, 200, indent)
+    # for i in img_number_list2: # 測試清單
+    #     OBR.main(i, resize_ratio, filter_size, dilate_iter, 200, indent)
 
     # 圖片部分參數 閾值可取500~800
-    # OBR.main(0, 0.4, 3, 5, 500, 100)
+    # OBR.main(4, 0.4, 3, 5, 500, 100)
 
     # 文字部分參數，如逗點或像素數少的字(ex 一)，min_area_size建議取的保守(200)
     # OBR.main(21, 0.4, 3, 5, 200, 100)
 
     # 隨機測試
-    # import random
-    # x = random.randrange(0, 803, 1) # 從0到803隨機取整數，步伐為1
-    # OBR.main(x, resize_ratio, filter_size, dilate_iter, 200, indent)
-    # print(f'第{x}頁')
+    import random
+    x = random.randrange(0, 803, 1) # 從0到803隨機取整數，步伐為1
+    OBR.main(x, resize_ratio, filter_size, dilate_iter, 200, indent)
+    print(f'第{x}頁')
