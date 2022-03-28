@@ -201,7 +201,7 @@ if __name__ == '__main__':
     img_number_list5 = [29, 81, 117, 421, 423, 426, 430, 432, 467, 493, 562, 613, 614, 624]  # 文字+圖片部分
     img_number_list6 = [616, 650, 666, 724, 725]  # 較淡的圖片+文字
 
-    for i in img_number_list1: # 測試清單
+    for i in img_number_list2  : # 測試清單
         OBR.main(i, resize_ratio, filter_size, dilate_iter, 200, indent)
 
     # 圖片部分參數 閾值可取500~800
