@@ -5,3 +5,7 @@
 /*.jpg
 /*.png
 /*.gif
+/*.tif
+
+#  忽略資料夾
+OldBookRemake/*
