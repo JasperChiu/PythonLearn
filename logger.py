@@ -11,13 +11,17 @@ def create_logger(log_folder):
     logging.captureWarnings(True)  # 捕捉 py waring message
     logger = logging.getLogger('Jasper')  # 捕捉 py waring message
     logger.setLevel(logging.DEBUG) #設定層級
-    simple_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    detail_formatter = logging.Formatter("%(asctime)s-%(name)s-%(levelname)s-%(message)s",
+    detail_formatter = logging.Formatter("%(asctime)s-%(name)s-%(filename)s-%(funcName)s-"
+                                         "%(module)s-%(lineno)d-%(levelname)s-%(message)s",
                                          datefmt="%Y%m%d")
+    simple_formatter = logging.Formatter("%(asctime)s-%(name)s-%(levelname)s-%(message)s",
+                                         datefmt="%Y%m%d")
+
     # 若不存在目錄則新建
     if not os.path.exists(dir_path+log_folder):
         os.makedirs(dir_path+log_folder)
 
+    # 註記若要詳細資訊 logger.debug('debug message', exc_info=True)；後面要加註 exc_info=True
     # file handler
     fileHandler = logging.FileHandler(f"{dir_path}{log_folder}/{filename}", 'a', 'utf-8') # 續寫設定
     # fileHandler = logging.FileHandler(f"{dir_path}{log_folder}/{filename}", 'w', 'utf-8') # 覆寫設定
@@ -28,7 +32,7 @@ def create_logger(log_folder):
     # console handler
     consoleHandler = logging.StreamHandler()
     consoleHandler.setLevel(logging.DEBUG)
-    consoleHandler.setFormatter(detail_formatter)
+    consoleHandler.setFormatter(simple_formatter)
     logger.addHandler(consoleHandler)
 
     return logger
