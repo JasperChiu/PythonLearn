@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from logger import create_logger
+
 
 class OldBookRemake:
     def __init__(self, file):
@@ -193,8 +195,9 @@ class OldBookRemake:
 
 if __name__ == '__main__':
     # class內填入要處理的檔案名稱
-    OBR = OldBookRemake("OldBook_CH.tif")
-
+    file_name = "OldBook_CH.tif"
+    OBR = OldBookRemake(file_name)
+    logger = create_logger("隨機測試")
     # 參數
     resize_ratio = 0.4  # 圖片縮放倍率
     filter_size = 3  # 灰階模糊化濾波器大小
@@ -213,7 +216,7 @@ if __name__ == '__main__':
     #     OBR.main(i, resize_ratio, filter_size, dilate_iter, 200, indent)
 
     # 圖片部分參數 閾值可取500~800
-    # OBR.main(4, 0.4, 3, 5, 500, 100)
+    # OBR.main(0, 0.4, 3, 5, 500, 100)
 
     # 文字部分參數，如逗點或像素數少的字(ex 一)，min_area_size建議取的保守(200)
     # OBR.main(21, 0.4, 3, 5, 200, 100)
@@ -223,3 +226,4 @@ if __name__ == '__main__':
     x = random.randrange(0, 803, 1) # 從0到803隨機取整數，步伐為1
     OBR.main(x, resize_ratio, filter_size, dilate_iter, 200, indent)
     print(f'第{x}頁')
+    logger.info(f'隨機測試 {file_name} 第{x}頁')

@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 class OldBookRemake:
     def __init__(self, file):
         # 要匯入的檔案名稱

@@ -1,11 +1,18 @@
 # exe file
 /*.exe
 
-#picture
+# picture
 /*.jpg
 /*.png
 /*.gif
 /*.tif
 
-#  忽略資料夾
+# 忽略資料夾
 OldBookRemake/*
+logs/*
+__pycache__/*
+
+# 忽略log檔格式
+/*.yaml
+/*.log
+/*.conf
