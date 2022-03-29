@@ -151,8 +151,10 @@ class OldBookRemake:
     def main(self, img_number, resize_ratio, filter_size, dilate_iter, min_area_size, indent):
         # 要處理的圖片序號
         imgs = []
+        # 以清單承接讀取出來的資料，其格式為(1,高度,寬度,通道數)，讀取複數圖片則為(n,高度,寬度,通道數)
+        # 不一定只能用cv2.IMREAD_COLOR來讀取格式，UNCHANGED、GRAYSCALE應該也都可以
+        # 但在中途的可視化還是需要以彩色呈現，因此在這邊先都以三通道圖像讀入，方便理解(後續單純執行程式的話，可以把中間很多地方優化掉)
         loaded, imgs = cv2.imreadmulti(self.file, img_number, 1, imgs, cv2.IMREAD_COLOR)
-
         for x in imgs:
             origin_img = x
             img, contours = self.img_preprocessing(origin_img, resize_ratio, filter_size, dilate_iter)
@@ -215,15 +217,20 @@ if __name__ == '__main__':
     # for i in img_number_list2: # 測試清單
     #     OBR.main(i, resize_ratio, filter_size, dilate_iter, 200, indent)
 
-    # 圖片部分參數 閾值可取500~800
-    # OBR.main(0, 0.4, 3, 5, 500, 100)
+    # 圖片部分參數，面積閾值可取500~800
+    # x = 1
+    # # OBR.main(x, 0.4, 3, 5, 500, 100)
+    # # OBR.main(x, 1, 3, 5, 1250, 250) # 原圖處理
+    # logger.info(f'圖片測試 {file_name} 第{x}頁')
 
     # 文字部分參數，如逗點或像素數少的字(ex 一)，min_area_size建議取的保守(200)
-    # OBR.main(21, 0.4, 3, 5, 200, 100)
+    x = 81
+    OBR.main(x, 0.4, 3, 5, 200, 100)
+    logger.info(f'文字測試 {file_name} 第{x}頁')
 
     # 隨機測試
-    import random
-    x = random.randrange(0, 803, 1) # 從0到803隨機取整數，步伐為1
-    OBR.main(x, resize_ratio, filter_size, dilate_iter, 200, indent)
-    print(f'第{x}頁')
-    logger.info(f'隨機測試 {file_name} 第{x}頁')
+    # import random
+    # x = random.randrange(0, 803, 1) # 從0到803隨機取整數，步伐為1
+    # OBR.main(x, resize_ratio, filter_size, dilate_iter, 200, indent)
+    # print(f'第{x}頁')
+    # logger.info(f'隨機測試 {file_name} 第{x}頁')

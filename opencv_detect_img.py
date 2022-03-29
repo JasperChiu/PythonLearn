@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-
+from logger import create_logger
 
 class OldBookRemake:
     def __init__(self, file):
@@ -164,11 +164,6 @@ class OldBookRemake:
                 cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), -1)
             self.show_img(img)
 
-            # img_line = self.draw_approx_hull_polygon(img, contours)
-            # img_rect = self.draw_min_rect_circle(img, contours)
-            # self.show_img(img_line)
-            # self.show_img(img_rect)
-            #
             # self.save_img(img_add,img_number)
 
 
@@ -176,7 +171,9 @@ class OldBookRemake:
 
 if __name__ == '__main__':
     # class內填入要處理的檔案名稱
-    OBR = OldBookRemake("OldBook_CH.tif")
+    file_name = "OldBook_CH.tif"
+    OBR = OldBookRemake(file_name)
+    logger = create_logger("隨機測試")
     # 參數
     resize_ratio = 0.4  # 圖片縮放倍率
     filter_size = 3  # 灰階模糊化濾波器大小
@@ -194,10 +191,9 @@ if __name__ == '__main__':
 
     # for i in img_number_list2: # 測試清單 # 檢測圖片迭代次數至少要20以上
     #     OBR.main(i, resize_ratio, filter_size, 20, 200, indent)
-
     # 圖片部分參數
-    # OBR.main(4, 0.4, 3, 20, 500, 100) # 簡單圖片
-    OBR.main(432, 0.4, 3, 20, 500, 100) # 較難圖片，簍空，可用矩形補
+    OBR.main(120, 0.4, 3, 20, 500, 100) # 簡單圖片
+    # OBR.main(432, 0.4, 3, 20, 500, 100) # 較難圖片，簍空，可用矩形補
     # OBR.main(81, 0.4, 3, 20, 500, 100)  # 較難圖片，簍空，矩形也補不完，可能還要用IOU跟Mask做對比(或統一都用IOU去算..?)
 
     # (81)文字部分參數，如逗點或像素數少的字(ex 一)，min_area_size建議取的保守(200)

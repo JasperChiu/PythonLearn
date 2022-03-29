@@ -66,7 +66,7 @@ for x in imgs:
     # 將圖片轉成灰度圖
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # 將灰階圖模糊化，能先處理掉一些噪點；有用；注意濾波器開到太大旁邊的數字可能就被塗掉了
-    img_gray = cv2.medianBlur(img_gray,3)
+    # img_gray = cv2.medianBlur(img_gray,3)
 
     # 將圖片二值化，ret是閾值，thresh是承接二值化後的資料
     # cv2.THRESH_BINARY_INV是在將其反轉，因為我們在乎的是文字的部分
@@ -82,7 +82,11 @@ for x in imgs:
     # 迭代次數表示做幾次膨脹操作，不一定做膨脹操作，但有膨脹的話會取得比較寬限，不會吃掉邊線
     thresh = cv2.dilate(thresh, kernel, iterations=5)
 
-    # thresh = cv2.Canny(thresh, 128, 256) # 邊緣檢測，會取的較細連文字部分都捕捉(暫時不使用)
+    # 3/29 簡單重新測試cv2.Canny()，再多膨脹一兩次就能提取出更細節的邊緣
+    # thresh = cv2.Canny(thresh, 128, 256) # 邊緣檢測，會取的較細連文字部分都捕捉
+    # show_img(thresh)
+    # thresh = cv2.dilate(thresh, kernel, iterations=2)
+    # show_img(thresh)
 
     # cv2.findContour() 接受的參數為二值圖，才能抓出等高線
     # 第一個參數為尋找輪廓的圖像，第二個參數是輪廓的檢索模式(檢索模式可參考https://blog.csdn.net/hjxu2016/article/details/77833336)
@@ -108,7 +112,7 @@ for x in imgs:
         cX = int(M["m10"] / M["m00"]) # 計算X方向質心
         cY = int(M["m01"] / M["m00"]) # 計算Y方向質心
 
-        if area < 1000: # 測試 若面積小於一定閾值，則加入清除清單
+        if area < 500: # 測試 若面積小於一定閾值，則加入清除清單
             # cv2.circle(img, (cX, cY), 5, (0, 255, 0), -1) # 在要清除的區塊做綠點標記
             cv2.drawContours(img, contours, i, (0, 255, 0), -1)  # 在要將清除的區塊以綠色塗滿
             clear_list.append(i)
