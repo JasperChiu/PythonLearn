@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
-from logger import create_logger
-
+from logger import logger_config
 
 class OldBookRemake:
     def __init__(self, file):
@@ -99,7 +98,7 @@ class OldBookRemake:
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         return img, contours
 
-    def img_noise_processing(self, img, contours, min_area_size, indent):
+    def img_noise_remove(self, img, contours, min_area_size, indent):
         # 雜訊處理；將前面框選出來的區塊，透過設定條件，來篩選那些是不要的雜訊
         # 兩種思路；其一透過計算面積，小於一定閾值的就清除掉。(謹慎取值，若是值設定的太激進逗點和句號可能都會消失，@也能嘗試透過數學取值，後25%的面積平均作為雜訊閾值?)
         # 其二透過計算質心，若是該區塊的質心落在指定的邊界外，則是為雜訊清除掉(要看各種案例，不曉得有沒有通則，或是透過一定的計算公式來決定取值)
@@ -122,49 +121,28 @@ class OldBookRemake:
                 # cv2.circle(img, (cX, cY), 10, (0, 0, 255), -1) # 在要清除的區塊做紅點標記
                 cv2.drawContours(img, contours, i, (0, 0, 255), -1) # 在要將清除的區塊以紅色塗滿
                 clear_list.append(i)
-            """ # (封存)計算效率較低的方法，因為要取邊界所有的點和選取的面積計算距離
-            for j in range(img.shape[0]): # 左邊界
-                c_distance = ((0 - cX)**2 + (j - cY)**2)**0.5
-                if c_distance < indent:
-                    cv2.circle(img, (cX, cY), 5, (0, 255, 0), -1)
-                    clear_list.append(i)
-            for j in range(img.shape[0]):# 右邊界
-                c_distance = ((img.shape[1] - cX) ** 2 + (j - cY) ** 2) ** 0.5
-                if c_distance < indent:
-                    cv2.circle(img, (cX, cY), 5, (0, 255, 0), -1)
-                    clear_list.append(i)
-            for j in range(img.shape[1]): # 上邊界
-                c_distance = ((j - cX) ** 2 + (0 - cY) ** 2) ** 0.5
-                if c_distance < indent:
-                    cv2.circle(img, (cX, cY), 5, (0, 255, 0), -1)
-                    clear_list.append(i)
-            for j in range(img.shape[1]): # 下邊界
-                c_distance = ((j - cX) ** 2 + (img.shape[0] - cY) ** 2) ** 0.5
-                if c_distance < indent:
-                    cv2.circle(img, (cX, cY), 5, (0, 255, 0), -1)
-                    clear_list.append(i)
-            """
         # contours_list和要清除的清單clear_list取差集，便可以獲得要保留的清單
         contours_list = set(contours_list).difference(set(clear_list))
         return contours_list
 
     def main(self, img_number, resize_ratio, filter_size, dilate_iter, min_area_size, indent):
-        # 要處理的圖片序號
-        imgs = []
+        # img_number 是要處理的圖片序號
         # 以清單承接讀取出來的資料，其格式為(1,高度,寬度,通道數)，讀取複數圖片則為(n,高度,寬度,通道數)
         # 不一定只能用cv2.IMREAD_COLOR來讀取格式，UNCHANGED、GRAYSCALE應該也都可以
         # 但在中途的可視化還是需要以彩色呈現，因此在這邊先都以三通道圖像讀入，方便理解(後續單純執行程式的話，可以把中間很多地方優化掉)
+        imgs = []
         loaded, imgs = cv2.imreadmulti(self.file, img_number, 1, imgs, cv2.IMREAD_COLOR)
+
         for x in imgs:
             origin_img = x
             img, contours = self.img_preprocessing(origin_img, resize_ratio, filter_size, dilate_iter)
-            contours_list = self.img_noise_processing(img,contours,min_area_size,indent)
+            contours_list = self.img_noise_remove(img,contours,min_area_size,indent)
             mask = np.zeros(img.shape, np.uint8) # 先建立全黑的遮罩(也可以全白啦，思路相同)
             for i in contours_list:
                 # 將要保留的區塊使用純白的色塊填滿
                 mask = cv2.drawContours(mask, contours, i, (255, 255, 255), -1)
             # dst為在img基礎上畫上contours框選到的所有區塊
-            # 紅色區塊和綠色區塊是img_noise_processing 所標註的要清除的區域(理論上也可以複製新的圖片單獨呈現，但就都先畫在img上==)
+            # 紅色區塊和綠色區塊是img_noise_remove所標註的要清除的區域(理論上也可以複製新的圖片單獨呈現，但就都先畫在img上==)
             dst = cv2.drawContours(img, contours, -1, (255, 0, 0), 3)
             self.show_img(dst)
             self.show_img(mask) # 呈現黑底白內容物的遮罩
@@ -199,7 +177,10 @@ if __name__ == '__main__':
     # class內填入要處理的檔案名稱
     file_name = "OldBook_CH.tif"
     OBR = OldBookRemake(file_name)
-    logger = create_logger("隨機測試")
+
+    logger_config = logger_config()
+    logger = logger_config.create_logger("隨機測試")
+
     # 參數
     resize_ratio = 0.4  # 圖片縮放倍率
     filter_size = 3  # 灰階模糊化濾波器大小
@@ -213,7 +194,7 @@ if __name__ == '__main__':
     img_number_list4 = [215, 216, 278, 788]  # 雜訊汙染到文字(較難)
     img_number_list5 = [29, 81, 117, 421, 423, 426, 430, 432, 467, 493, 562, 613, 614, 624]  # 文字+圖片部分
     img_number_list6 = [616, 650, 666, 724, 725]  # 較淡的圖片+文字
-
+                        
     # for i in img_number_list2: # 測試清單
     #     OBR.main(i, resize_ratio, filter_size, dilate_iter, 200, indent)
 
@@ -224,13 +205,13 @@ if __name__ == '__main__':
     # logger.info(f'圖片測試 {file_name} 第{x}頁')
 
     # 文字部分參數，如逗點或像素數少的字(ex 一)，min_area_size建議取的保守(200)
-    x = 81
-    OBR.main(x, 0.4, 3, 5, 200, 100)
-    logger.info(f'文字測試 {file_name} 第{x}頁')
+    # x = 759
+    # OBR.main(x, 0.4, 3, 5, 200, 100)
+    # logger.info(f'文字測試 {file_name} 第{x}頁')
 
     # 隨機測試
-    # import random
-    # x = random.randrange(0, 803, 1) # 從0到803隨機取整數，步伐為1
-    # OBR.main(x, resize_ratio, filter_size, dilate_iter, 200, indent)
-    # print(f'第{x}頁')
-    # logger.info(f'隨機測試 {file_name} 第{x}頁')
+    import random
+    x = random.randrange(0, 803, 1) # 從0到803隨機取整數，步伐為1
+    OBR.main(x, resize_ratio, filter_size, dilate_iter, 200, indent)
+    print(f'第{x}頁')
+    logger.info(f'隨機測試 {file_name} 第{x}頁')

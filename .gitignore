@@ -8,9 +8,10 @@
 /*.tif
 
 # 忽略資料夾
-OldBookRemake/*
+OldBookRemake*/*
 logs/*
 __pycache__/*
+
 
 # 忽略log檔格式
 /*.yaml
