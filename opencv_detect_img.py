@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from logger import create_logger
+from logger import logger_config
 
 class OldBookRemake:
     def __init__(self, file):
@@ -173,7 +173,9 @@ if __name__ == '__main__':
     # class內填入要處理的檔案名稱
     file_name = "OldBook_CH.tif"
     OBR = OldBookRemake(file_name)
-    logger = create_logger("隨機測試")
+
+    logger_config = logger_config()
+    logger = logger_config.create_logger("隨機測試")
     # 參數
     resize_ratio = 0.4  # 圖片縮放倍率
     filter_size = 3  # 灰階模糊化濾波器大小
@@ -192,7 +194,7 @@ if __name__ == '__main__':
     # for i in img_number_list2: # 測試清單 # 檢測圖片迭代次數至少要20以上
     #     OBR.main(i, resize_ratio, filter_size, 20, 200, indent)
     # 圖片部分參數
-    OBR.main(120, 0.4, 3, 20, 500, 100) # 簡單圖片
+    OBR.main(7, 0.4, 3, 20, 500, 100) # 簡單圖片
     # OBR.main(432, 0.4, 3, 20, 500, 100) # 較難圖片，簍空，可用矩形補
     # OBR.main(81, 0.4, 3, 20, 500, 100)  # 較難圖片，簍空，矩形也補不完，可能還要用IOU跟Mask做對比(或統一都用IOU去算..?)
 
