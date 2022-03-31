@@ -31,12 +31,12 @@ sql_drop_table = "drop table UserName"
 try:
     # 首先建立Connection物件，進入資料庫
     # 1. 讀入字典的方式進入資料庫
-    db = pymysql.connect(**db_settings)
+    conn = pymysql.connect(**db_settings)
     # 2. 也可以直接寫成單行形式
     # db = pymysql.connect(host='localhost', port=3306, user='root', passwd='Jwander1098',
     #                      db='sql_test', charset='utf8')
     # 建立操作游標
-    cursor = db.cursor()
+    cursor = conn.cursor()
 
     # 執行語法
     try:
@@ -52,42 +52,42 @@ try:
         # result = cursor.fetchone() # 取得單行資料
         # result = cursor.fetchmany() # 取得多行資料
         result = cursor.fetchall() # 取得所有資料
-        for i in result:
-            print(i)
+        for row in result:
+            print(row)
 
         print("列出表格內名字為Lao的資料")
         cursor.execute(sql_select_where, ('Lao')) # 搜尋名字為'Lao'的資料
         result = cursor.fetchall()
-        for i in result:
-            print(i)
+        for row in result:
+            print(row)
 
         print("將表格內姓Lee的名字改為Shao")
         cursor.execute(sql_update, ('Shao', 'Lee'))
         cursor.execute(sql_select)
         result = cursor.fetchall()
-        for i in result:
-            print(i)
+        for row in result:
+            print(row)
 
         print("刪除SID = 1 的資料")
         cursor.execute(sql_delete, (1))
         cursor.execute(sql_select)
         result = cursor.fetchall()
-        for i in result:
-            print(i)
+        for row in result:
+            print(row)
 
         # 儲存變更
-        db.commit()
+        conn.commit()
         print('success')
     except:
         # 發生錯誤時停止執行SQL
-        db.rollback()
+        conn.rollback()
         print('error')
 
     finally:
         # 關閉游標
         cursor.close()
         # 關閉連線
-        db.close()
+        conn.close()
 
 except Exception as ex:
     print(ex)
@@ -99,15 +99,20 @@ sql = "以字串形式填入 {新增、修改、刪除的語法}"
 try:
   cursor.execute(sql)
   #提交
-  db.commit()
+  conn.commit()
 except:
   #發生錯誤時停止執行SQL
-  db.rollback()
+  conn.rollback()
   print('error')
   
 # 關閉物件
 # 關閉游標
 cursor.close()
 # 關閉連線
-db.close()
+conn.close()
+
+# 也可以使用 python 的 with 語法來連接資料庫及執行 SQL 語法，在 with 區塊結束後
+# connection 及 cursor 都會自動關閉。
+with pymysql.connect(...) as conn:
+    with conn.cursor(...) as cursor:
 """
