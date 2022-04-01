@@ -210,8 +210,52 @@ if __name__ == '__main__':
     # logger.info(f'文字測試 {file_name} 第{x}頁')
 
     # 隨機測試
-    import random
-    x = random.randrange(0, 803, 1) # 從0到803隨機取整數，步伐為1
-    OBR.main(x, resize_ratio, filter_size, dilate_iter, 200, indent)
-    print(f'第{x}頁')
-    logger.info(f'隨機測試 {file_name} 第{x}頁')
+    # import random
+    # x = random.randrange(0, 803, 1) # 從0到803隨機取整數，步伐為1
+    # OBR.main(x, resize_ratio, filter_size, dilate_iter, 200, indent)
+    # print(f'第{x}頁')
+    # logger.info(f'隨機測試 {file_name} 第{x}頁')
+
+    # cv2.imcount 可以讀取總頁數
+
+
+    # img_test = cv2.imdecode(np.fromfile(r"C:\Users\jasper chiu\Downloads\OldBook_TWPoetry.tif", dtype=np.uint8), -1)
+    # img_page = cv2.imcount(r"C:\Users\jasper chiu\Downloads\OldBook_TWPoetry.tif")
+    # print(img_page)
+    # print(img_test)
+    # print(img_test.shape)
+    # # img_write = cv2.imencode(".tif", img_test)[1].tofile(img_path)
+    # OBR.show_img(img_test)
+
+    """測試使用，嘗試以PIL讀進資料，避開cv2無法讀取中文路徑的問題"""
+
+    from PIL import Image
+    path = r"E:\JasperWork\PythonLearn\台灣現代詩史論.tif"
+    def tifread(path):
+        tiff = Image.open(path)
+        # tiff = np.array(tiff)*255
+        # print(tiff)
+        images = []
+        try:
+            for i in range(0,10):
+                tiff.seek(i)
+                print(tiff.mode)
+                images.append((np.array(tiff)*255).astype(np.uint8))
+            return np.array(images)
+        except:
+            return np.array(images)
+
+
+    images = tifread(path)
+    print(len(images))
+    print(images.shape)
+
+    # img = cv2.cvtColor(np.array(images[0]), cv2.COLOR_RGB2BGR)
+
+    # print(img)
+    print(images[0].shape)
+    OBR.show_img(images[0])
+
+
+    # for i in images:
+    #     OBR.show_img(i)
