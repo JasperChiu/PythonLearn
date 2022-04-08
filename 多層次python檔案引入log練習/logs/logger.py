@@ -19,8 +19,12 @@ class MyLogger:
 
 
         formatter = logging.Formatter('%(asctime)s - [%(filename)s-->line:%(lineno)d] - %(levelname)s: %(message)s')
+        detail_formatter = logging.Formatter("%(asctime)s-%(name)s-[%(filename)s-line:%(lineno)d]-"
+                                             "%(funcName)s-%(module)s-%(levelname)s-%(message)s",
+                                             datefmt="%Y%m%d")
+
         stream_handler.setFormatter(formatter)
-        log_file_handler.setFormatter(formatter)
+        log_file_handler.setFormatter(detail_formatter)
 
         if not my_logger.handlers:
             my_logger.addHandler(stream_handler)

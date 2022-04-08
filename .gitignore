@@ -16,6 +16,7 @@ BLL/__pycache__
 
 # 忽略這類型的所有資料夾
 **/__pycache__
+**/.log
 
 # 忽略log檔格式
 /*.yaml
