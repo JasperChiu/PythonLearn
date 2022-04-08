@@ -1,0 +1,5 @@
+2022-04-08 15:11:04,001 - [chapter8_多層次python套用同一logger.py-->line:12] - INFO: 開始記錄main.py log
+2022-04-08 15:11:04,001 - [chapter8_多層次python套用同一logger.py-->line:17] - INFO: main.py的py_log_test正確執行中
+2022-04-08 15:11:04,005 - [uselog.py-->line:15] - INFO: 內層的python檔案被調用了
+2022-04-08 15:11:04,005 - [uselog.py-->line:20] - INFO: 執行py_log_test123函式
+2022-04-08 15:11:04,005 - [uselog.py-->line:21] - INFO: 控制台顯示層級為INFO
