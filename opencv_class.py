@@ -199,10 +199,10 @@ if __name__ == '__main__':
     #     OBR.main(i, resize_ratio, filter_size, dilate_iter, 200, indent)
 
     # 圖片部分參數，面積閾值可取500~800
-    # x = 1
-    # # OBR.main(x, 0.4, 3, 5, 500, 100)
-    # # OBR.main(x, 1, 3, 5, 1250, 250) # 原圖處理
-    # logger.info(f'圖片測試 {file_name} 第{x}頁')
+    x = 100
+    # OBR.main(x, 0.4, 3, 5, 200, 100)
+    OBR.main(x, 1, 3, 5, 500, 250) # 原圖處理
+    logger.info(f'圖片測試 {file_name} 第{x}頁')
 
     # 文字部分參數，如逗點或像素數少的字(ex 一)，min_area_size建議取的保守(200)
     # x = 759
@@ -227,8 +227,10 @@ if __name__ == '__main__':
     # # img_write = cv2.imencode(".tif", img_test)[1].tofile(img_path)
     # OBR.show_img(img_test)
 
-    """測試使用，嘗試以PIL讀進資料，避開cv2無法讀取中文路徑的問題"""
 
+
+    """測試使用，嘗試以PIL讀進資料，避開cv2無法讀取中文路徑的問題"""
+    """
     from PIL import Image
     path = r"E:\JasperWork\PythonLearn\台灣現代詩史論.tif"
     def tifread(path):
@@ -259,3 +261,4 @@ if __name__ == '__main__':
 
     # for i in images:
     #     OBR.show_img(i)
+    """
