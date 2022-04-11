@@ -11,6 +11,8 @@
 OldBookRemake*/*
 logs/*
 __pycache__/*
+多層次python檔案引入log練習/*
+**/__pycache__
 
 
 # 忽略log檔格式
